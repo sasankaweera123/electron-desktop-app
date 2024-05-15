@@ -1,0 +1,22 @@
+{
+  "name": "electron-desktop-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sasankaweera123/electron-desktop-app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sasankaweera123/electron-desktop-app/issues"
+  },
+  "homepage": "https://github.com/sasankaweera123/electron-desktop-app#readme",
+  "dependencies": {
+    "electron": "^30.0.5"
+  }
+}
