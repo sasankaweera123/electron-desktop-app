@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/sasankaweera123/electron-desktop-app#readme",
   "dependencies": {
-    "electron": "^30.0.5"
+    "electron": "^30.0.5",
+    "fluent-ffmpeg": "^2.1.2"
   }
 }
