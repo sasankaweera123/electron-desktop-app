@@ -11,29 +11,30 @@
         <label for="video">Enter the video file:</label>
         <input accept="video/*" id="video" name="video" type="file"/>
     </div>
-    <div id="videoInformation">
+    <div>
         <input type="submit" value="Get Info"/>
     </div>
+    <div id="videoInformation"></div>
 </form>
 
 <script>
+    const electron = require('electron');
+    const {ipcRenderer} = electron;
     document.querySelector('form').addEventListener('submit', function (e) {
         e.preventDefault();
         const video = document.querySelector('#video').files[0];
-        const videoUrl = URL.createObjectURL(video);
-        const videoElement = document.createElement('video');
-        videoElement.src = videoUrl;
-        videoElement.onloadedmetadata = function () {
-            const videoInfo = document.querySelector('#videoInformation');
-            const videoInfoElement = document.createElement('div');
-            videoInfoElement.innerHTML = `
-                <p>Duration: ${videoElement.duration} seconds</p>
-                <p>Width: ${videoElement.videoWidth}</p>
-                <p>Height: ${videoElement.videoHeight}</p>
-            `;
-            videoInfo.appendChild(videoInfoElement);
-            URL.revokeObjectURL(videoUrl);
-        };
+        ipcRenderer.send('video:submit', video.path);
+
+    });
+    ipcRenderer.on('video:metadata', function (e, videoInfo) {
+        document.querySelector('#videoInformation').innerHTML = `
+            <ul>
+                <li>Duration: ${videoInfo.duration}</li>
+                <li>Title: ${videoInfo.tags.title}</li>
+                <li>Resolution: ${videoInfo.resolution}</li>
+                <li>Size: ${videoInfo.size}</li>
+            </ul>
+        `;
     });
 </script>
 </body>
