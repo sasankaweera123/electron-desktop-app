@@ -18,22 +18,18 @@
 </form>
 
 <script>
-    const electron = require('electron');
-    const {ipcRenderer} = electron;
     document.querySelector('form').addEventListener('submit', function (e) {
         e.preventDefault();
         const video = document.querySelector('#video').files[0];
-        ipcRenderer.send('video:submit', video.path);
+        window.electron.submitVideo(video.path);
 
     });
-    ipcRenderer.on('video:metadata', function (e, videoInfo) {
-        document.querySelector('#videoInformation').innerHTML = `
-            <ul>
-                <li>Duration: ${videoInfo.duration}</li>
-                <li>Title: ${videoInfo.tags.title}</li>
-                <li>Resolution: ${videoInfo.resolution}</li>
-                <li>Size: ${videoInfo.size}</li>
-            </ul>
+
+    window.electron.receiveMetadata((videoMetadata) => {
+        const videoInformation = document.querySelector('#videoInformation');
+        videoInformation.innerHTML = `
+            <p>Video duration: ${videoMetadata.duration}</p>
+
         `;
     });
 </script>
