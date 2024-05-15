@@ -1,7 +1,8 @@
 const electron = require('electron');
 
-const {app} = electron;
+const {app, BrowserWindow} = electron;
 
 app.on('ready', () => {
-    console.log('The application is ready.');
+    const mainWindow = new BrowserWindow({});
+    mainWindow.loadURL(`file://${__dirname}/index.html`);
 });
