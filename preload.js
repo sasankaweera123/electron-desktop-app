@@ -1,13 +1,13 @@
 const {ipcRenderer, contextBridge} = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
-    submitVideo: (path) => {
-        ipcRenderer.send('video:submit', path);
-    },
-    receiveMetadata: (callback) => {
-        ipcRenderer.on('video:metadata', (event, metadata) => {
-            console.log(metadata);
-            callback(metadata);
-        });
+    //Todo: implement the other methods
+    //Todo: Optimize the code
+    todo: {
+        add: (todo) => ipcRenderer.send('todo:add', todo),
+        clear: () => ipcRenderer.on('todo:clear', () => {
+            document.querySelector('ul').innerHTML = '';
+        }),
+        receiveTodo: (callback) => ipcRenderer.on('todo:add', (event, todo) => callback(todo)),
     }
 });
