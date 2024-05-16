@@ -1,7 +1,7 @@
 const electron = require('electron');
 const path = require('path');
 
-const {app, BrowserWindow, Menu} = electron;
+const {app, BrowserWindow, Menu, ipcMain} = electron;
 
 let mainWindow;
 let addWindow;
@@ -14,8 +14,8 @@ const isDev = process.env.NODE_ENV === 'development';
 app.on('ready', () => {
     mainWindow = new BrowserWindow({
         webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
+            nodeIntegration: false,
+            contextIsolation: true,
             preload: path.join(__dirname, 'preload.js')
         }
     });
@@ -33,18 +33,33 @@ app.on('ready', () => {
     Menu.setApplicationMenu(mainMenu);
 });
 
+/**
+ * Create the add window.
+ */
 function createAddWindow() {
     addWindow = new BrowserWindow({
         width: isDev ? 600 : 300,
         height: 200,
-        title: 'Add New Todo'
+        title: 'Add New Todo',
+        webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+            preload: path.join(__dirname, 'preload.js')
+        }
     });
     addWindow.loadURL(`file://${__dirname}/add.html`).then(() => {
         if (isDev) {
             addWindow.webContents.openDevTools();
         }
     });
+    addWindow.on('closed', () => addWindow = null);
 }
+
+ipcMain.on('todo:add', (event, todo) => {
+    mainWindow.webContents.send('todo:add', todo);
+    addWindow.close();
+});
+
 
 /**
  * Menu template for the application.
@@ -58,6 +73,12 @@ const menuTemplate = [
                 label: 'Add New Todo',
                 click() {
                     createAddWindow();
+                }
+            },
+            {
+                label: 'Clear Todos',
+                click() {
+                    mainWindow.webContents.send('todo:clear');
                 }
             },
             {
@@ -78,7 +99,7 @@ if (process.platform === 'darwin') {
     menuTemplate.unshift({});
 }
 
-if(isDev) {
+if (isDev) {
     menuTemplate.push({
         label: 'Developer',
         submenu: [
