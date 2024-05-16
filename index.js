@@ -1,119 +1,20 @@
 const electron = require('electron');
 const path = require('path');
-
-const {app, BrowserWindow, Menu, ipcMain} = electron;
+const {app, BrowserWindow, ipcMain} = electron;
+const TimerTray = require('./app/timer_tray');
+const MainWindow = require('./app/main_window');
 
 let mainWindow;
-let addWindow;
+let tray;
 
-const isDev = process.env.NODE_ENV === 'development';
-
-/**
- * Create the main window when the application is ready.
- */
 app.on('ready', () => {
-    mainWindow = new BrowserWindow({
-        webPreferences: {
-            nodeIntegration: false,
-            contextIsolation: true,
-            preload: path.join(__dirname, 'preload.js')
-        }
-    });
-    mainWindow.loadURL(`file://${__dirname}/index.html`).then(() => {
-        if (isDev) {
-            mainWindow.webContents.openDevTools();
-        }
-    });
+    if(process.platform === 'darwin') app.dock.hide();
+    mainWindow = new MainWindow(`file://${__dirname}/src/index.html`);
 
-    // Quit the application when the main window is closed.
-    mainWindow.on('closed', () => app.quit());
-
-    // Create the application menu.
-    const mainMenu = Menu.buildFromTemplate(menuTemplate);
-    Menu.setApplicationMenu(mainMenu);
+    const iconName = process.platform === 'win32' ? 'windows-icon.png' : 'iconTemplate.png';
+    tray = new TimerTray(path.join(__dirname, `./src/assets/${iconName}`), mainWindow);
 });
 
-/**
- * Create the add window.
- */
-function createAddWindow() {
-    addWindow = new BrowserWindow({
-        width: isDev ? 600 : 300,
-        height: 200,
-        title: 'Add New Todo',
-        webPreferences: {
-            nodeIntegration: false,
-            contextIsolation: true,
-            preload: path.join(__dirname, 'preload.js')
-        }
-    });
-    addWindow.loadURL(`file://${__dirname}/add.html`).then(() => {
-        if (isDev) {
-            addWindow.webContents.openDevTools();
-        }
-    });
-    addWindow.on('closed', () => addWindow = null);
-}
-
-ipcMain.on('todo:add', (event, todo) => {
-    mainWindow.webContents.send('todo:add', todo);
-    addWindow.close();
+ipcMain.on('update-timer', (event, timeLeft) => {
+    tray.setTitle(timeLeft);
 });
-
-
-/**
- * Menu template for the application.
- * @type {[{submenu: [{label: string},{accelerator: (string), label: string, click(): void}], label: string}]}
- */
-const menuTemplate = [
-    {
-        label: 'File',
-        submenu: [
-            {
-                label: 'Add New Todo',
-                click() {
-                    createAddWindow();
-                }
-            },
-            {
-                label: 'Clear Todos',
-                click() {
-                    mainWindow.webContents.send('todo:clear');
-                }
-            },
-            {
-                label: 'Quit',
-                accelerator: process.platform === 'darwin' ? 'Command+Q' : 'Ctrl+Q',
-                click() {
-                    app.quit();
-                }
-            }
-        ]
-    }
-];
-
-/**
- * Add an empty object to the beginning of the menuTemplate array if the platform is macOS.
- */
-if (process.platform === 'darwin') {
-    menuTemplate.unshift({});
-}
-
-if (isDev) {
-    menuTemplate.push({
-        label: 'Developer',
-        submenu: [
-            {
-                label: 'Toggle Developer Tools',
-                accelerator: process.platform === 'darwin' ? 'Command+Alt+I' : 'Ctrl+Shift+I',
-                click(item, focusedWindow) {
-                    focusedWindow.toggleDevTools();
-                }
-            },
-            {
-                label: 'Reload',
-                role: 'reload'
-            }
-        ]
-    });
-}
