@@ -10,5 +10,12 @@
     <input autofocus id="todo" name="todo" type="text">
     <button type="submit">Add</button>
 </form>
+<script>
+    document.querySelector('form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const todo = document.querySelector('#todo').value;
+        window.electron.todo.add(todo);
+    });
+</script>
 </body>
 </html>
