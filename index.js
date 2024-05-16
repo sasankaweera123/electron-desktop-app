@@ -35,11 +35,15 @@ app.on('ready', () => {
 
 function createAddWindow() {
     addWindow = new BrowserWindow({
-        width: 300,
+        width: isDev ? 600 : 300,
         height: 200,
         title: 'Add New Todo'
     });
-    addWindow.loadURL(`file://${__dirname}/add.html`);
+    addWindow.loadURL(`file://${__dirname}/add.html`).then(() => {
+        if (isDev) {
+            addWindow.webContents.openDevTools();
+        }
+    });
 }
 
 /**
@@ -72,4 +76,23 @@ const menuTemplate = [
  */
 if (process.platform === 'darwin') {
     menuTemplate.unshift({});
+}
+
+if(isDev) {
+    menuTemplate.push({
+        label: 'Developer',
+        submenu: [
+            {
+                label: 'Toggle Developer Tools',
+                accelerator: process.platform === 'darwin' ? 'Command+Alt+I' : 'Ctrl+Shift+I',
+                click(item, focusedWindow) {
+                    focusedWindow.toggleDevTools();
+                }
+            },
+            {
+                label: 'Reload',
+                role: 'reload'
+            }
+        ]
+    });
 }
