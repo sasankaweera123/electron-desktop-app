@@ -29,7 +29,9 @@
         const videoInformation = document.querySelector('#videoInformation');
         videoInformation.innerHTML = `
             <p>Video duration: ${videoMetadata.duration}</p>
-
+            <p>Video Size: ${videoMetadata.size}</p>
+            <p>Video Format: ${videoMetadata.format_long_name}</p>
+            <p>Video title: ${videoMetadata.tags.title}</p>
         `;
     });
 </script>

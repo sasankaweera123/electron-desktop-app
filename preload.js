@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('electron', {
     },
     receiveMetadata: (callback) => {
         ipcRenderer.on('video:metadata', (event, metadata) => {
+            console.log(metadata);
             callback(metadata);
         });
     }
