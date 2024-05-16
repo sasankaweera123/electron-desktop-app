@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Video Info </h1>
+<form>
+    <div id="videoInfo">
+        <label for="video">Enter the video file:</label>
+        <input accept="video/*" id="video" name="video" type="file"/>
+    </div>
+    <div>
+        <input type="submit" value="Get Info"/>
+    </div>
+    <div id="videoInformation"></div>
+</form>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const video = document.querySelector('#video').files[0];
+        window.electron.submitVideo(video.path);
+
+    });
+
+    window.electron.receiveMetadata((videoMetadata) => {
+        const videoInformation = document.querySelector('#videoInformation');
+        videoInformation.innerHTML = `
+            <p>Video duration: ${videoMetadata.duration}</p>
+            <p>Video Size: ${videoMetadata.size}</p>
+            <p>Video Format: ${videoMetadata.format_long_name}</p>
+            <p>Video title: ${videoMetadata.tags.title}</p>
+        `;
+    });
+</script>
+</body>
+</html>
