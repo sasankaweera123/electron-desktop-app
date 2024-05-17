@@ -2,6 +2,8 @@
 
 An Electron-based application that extracts and displays metadata from uploaded videos, providing users with detailed information about their video files using web technologies for a seamless desktop experience.
 
+![mock_img](001%20-%20mockup.png)
+
 ## Getting started
 
 `npm i`
