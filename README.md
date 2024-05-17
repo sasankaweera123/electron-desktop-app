@@ -6,6 +6,6 @@ An Electron-based application that extracts and displays metadata from uploaded 
 
 `npm i`
 
-### Satrt the project
+### Start the project
 
 `npm start`
